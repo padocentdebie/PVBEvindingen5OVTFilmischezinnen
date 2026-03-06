@@ -2,98 +2,183 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>filmisch rapporteren: de ovt-puzzel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Systeem Filmisch Rapporteren | OVT-Training</title>
     <style>
-        :root { --korps-blauw: #002C52; --accent: #004682; --achtergrond: #F4F7F9; --wit: #FFFFFF; --grijs: #D1D5DB; --succes: #2E7D32; --fout: #d32f2f; }
-        body { font-family: Arial, sans-serif; background: var(--achtergrond); margin: 0; padding: 20px; overflow: hidden; }
-        .sectie-card { background: var(--wit); padding: 15px; border: 1px solid var(--grijs); border-radius: 2px; margin-bottom: 10px; }
-        h1 { color: var(--korps-blauw); border-bottom: 2px solid var(--korps-blauw); padding-bottom: 5px; font-size: 18px; margin-top: 0; text-transform: lowercase; }
-        .instructie-blok { background: #E1E8ED; border-left: 4px solid var(--korps-blauw); padding: 10px; margin-bottom: 10px; font-size: 12px; line-height: 1.4; }
-        
+        :root { 
+            --korps-blauw: #002C52; 
+            --accent: #004682; 
+            --achtergrond: #ECEFF1; 
+            --wit: #FFFFFF; 
+            --grijs-rand: #B0BEC5; 
+            --tekst-donker: #263238;
+            --succes: #388E3C; 
+            --fout: #C62828; 
+        }
+
+        body { 
+            font-family: "Segoe UI", Arial, sans-serif; 
+            background: var(--achtergrond); 
+            color: var(--tekst-donker);
+            margin: 0; padding: 20px; 
+            overflow: hidden; 
+        }
+
+        /* Header & Instructie */
+        .header-container { 
+            background: var(--wit); 
+            padding: 20px; 
+            border: 1px solid var(--grijs-rand); 
+            border-top: 5px solid var(--korps-blauw);
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        h1 { margin: 0 0 10px 0; font-size: 20px; color: var(--korps-blauw); text-transform: lowercase; }
+
+        .instructie-blok { 
+            background: #F8F9FA; 
+            border-left: 4px solid var(--korps-blauw); 
+            padding: 12px; 
+            font-size: 13px; 
+            line-height: 1.5;
+        }
+
+        /* Werkveld */
         #game-area { 
-            position: relative; width: 100%; height: 50vh; 
-            background: var(--wit); border: 2px solid var(--korps-blauw); 
-            overflow: hidden; background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 30px 30px;
+            position: relative; 
+            width: 100%; 
+            height: 52vh; 
+            background: var(--wit); 
+            border: 1px solid var(--grijs-rand); 
+            border-radius: 4px;
+            overflow: hidden; 
+            background-image: radial-gradient(#CFD8DC 1px, transparent 1px); 
+            background-size: 40px 40px;
         }
-        
+
         .word-box { 
-            position: absolute; padding: 8px 12px; background: #fff; 
-            border: 1px solid var(--korps-blauw); cursor: grab; user-select: none;
-            font-size: 13px; font-weight: bold; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            white-space: nowrap; z-index: 10; text-transform: lowercase;
+            position: absolute; 
+            padding: 10px 16px; 
+            background: var(--wit); 
+            border: 1px solid var(--korps-blauw); 
+            cursor: grab; 
+            user-select: none;
+            font-size: 14px; 
+            font-weight: 500; 
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
+            white-space: nowrap; 
+            z-index: 10; 
+            text-transform: lowercase;
         }
-        .word-box:active { cursor: grabbing; z-index: 1000; border-color: #ff9800; }
         
-        .status-bar { background: var(--korps-blauw); color: white; padding: 10px; text-align: center; font-weight: bold; font-size: 13px; margin-bottom: 10px; }
-        
-        .feedback-container {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            text-align: center; pointer-events: none; opacity: 0; z-index: 2000;
+        .word-box:active { cursor: grabbing; z-index: 1000; border-color: #FF9800; }
+
+        /* Status & Feedback */
+        .status-bar { 
+            background: var(--korps-blauw); 
+            color: white; 
+            padding: 12px; 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 14px; 
+            margin-top: 10px;
+            border-radius: 2px;
         }
-        .feedback-emoji { font-size: 80px; display: block; }
-        .feedback-name { font-size: 20px; font-weight: bold; color: var(--korps-blauw); background: rgba(255,255,255,0.8); padding: 5px 15px; border-radius: 20px; }
+
+        .feedback-overlay {
+            position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%);
+            text-align: center; pointer-events: none; 
+            opacity: 0; z-index: 2000;
+        }
+        .fb-emoji { font-size: 90px; display: block; filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.2)); }
+        .fb-name { 
+            font-size: 18px; font-weight: bold; color: var(--korps-blauw); 
+            background: rgba(255,255,255,0.95); padding: 8px 25px; 
+            border-radius: 40px; border: 2px solid var(--korps-blauw);
+            display: inline-block; margin-top: 10px;
+        }
         
-        @keyframes popFeedback { 
+        @keyframes popInFeedback { 
             0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 
-            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 
         }
-        .animate-feedback { animation: popFeedback 2.5s ease-in-out forwards; }
+        .animate-fb { animation: popInFeedback 2.8s ease-in-out forwards; }
 
-        .feedback-buttons { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 3000; }
-        .fb-btn { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; font-size: 25px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .side-controls { 
+            position: fixed; right: 25px; top: 50%; 
+            transform: translateY(-50%); 
+            display: flex; flex-direction: column; gap: 20px; 
+        }
+        .fb-btn { 
+            width: 65px; height: 65px; border-radius: 50%; border: none; 
+            cursor: pointer; font-size: 30px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        .fb-btn:active { transform: scale(0.9); }
         .up { background: var(--succes); color: white; }
         .down { background: var(--fout); color: white; }
 
+        /* Login Scherm */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--achtergrond); z-index: 4000; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: var(--wit); padding: 30px; border: 1px solid var(--grijs); width: 320px; text-align: center; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--grijs); }
-        .controls { margin-top: 15px; text-align: center; display: flex; justify-content: center; gap: 10px; }
-        button { background: var(--korps-blauw); color: white; border: none; padding: 12px 20px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 11px; }
+        .login-card { background: var(--wit); padding: 40px; border: 1px solid var(--grijs-rand); width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--korps-blauw); }
+        input, select { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--grijs-rand); box-sizing: border-box; font-size: 14px; }
+        
+        .bottom-nav { margin-top: 20px; text-align: center; display: flex; justify-content: center; gap: 15px; }
+        .btn-action { 
+            background: var(--korps-blauw); color: white; border: none; 
+            padding: 14px 25px; cursor: pointer; font-weight: bold; 
+            text-transform: uppercase; font-size: 12px; letter-spacing: 1px;
+        }
+        .btn-reset { background: #546E7A; }
     </style>
 </head>
 <body>
 
 <div id="login-overlay">
     <div class="login-card">
-        <h3>politieschool: ovt training</h3>
-        <input type="text" id="username" placeholder="naam">
+        <h2 style="color: var(--korps-blauw); margin-top:0;">ovt training</h2>
+        <p style="font-size: 14px; color: #607D8B;">voer uw naam en eenheid in</p>
+        <input type="text" id="username" placeholder="naam student">
         <select id="userclass">
-            <option value="">-- kies klas --</option>
-            <option value="delta">delta</option><option value="echo">echo</option><option value="foxtrot">foxtrot</option>
-            <option value="golf">golf</option><option value="hotel">hotel</option><option value="lima">lima</option><option value="mike">mike</option>
+            <option value="">-- kies eenheid --</option>
+            <option value="delta">delta</option><option value="echo">echo</option>
+            <option value="foxtrot">foxtrot</option><option value="golf">golf</option>
+            <option value="hotel">hotel</option><option value="lima">lima</option>
+            <option value="mike">mike</option>
         </select>
-        <button style="width:100%" onclick="joinGame()">start sessie</button>
+        <button class="btn-action" style="width:100%" onclick="joinGame()">systeem betreden</button>
     </div>
 </div>
 
-<div class="sectie-card">
-    <h1>filmisch rapporteren: ovt check</h1>
+<div class="header-container">
+    <h1>filmisch rapporteren: de ovt-puzzel</h1>
     <div class="instructie-blok">
-        <strong>let op:</strong> alle blokken zijn in kleine letters om sturing te voorkomen. 
-        <br>1. vorm een zin in de <strong>ovt</strong>.
-        <br>2. denk bij het presenteren aan de juiste <strong>hoofdletters</strong> en spelling.
-        <br>3. feedbackgevers: let op of de zin filmisch is én of de grammatica klopt!
+        <strong>instructie:</strong> gebruik de fragmenten om een <u>filmische</u> zin in de <strong>ovt</strong> te vormen. 
+        <br>geen hoofdletters aanwezig: bedenk de juiste spelling tijdens de mondelinge toelichting.
     </div>
-    <div id="turn-display" class="status-bar">laden...</div>
+    <div id="turn-display" class="status-bar">verbinding maken met database...</div>
 </div>
 
 <div id="game-area">
-    <div id="feedback-visual" class="feedback-container">
-        <span id="fb-emoji" class="feedback-emoji"></span>
-        <span id="fb-user" class="feedback-name"></span>
+    <div id="feedback-visual" class="feedback-overlay">
+        <span id="fb-emoji" class="fb-emoji"></span>
+        <span id="fb-user" class="fb-name"></span>
     </div>
 </div>
 
-<div class="feedback-buttons">
+<div class="side-controls">
     <button class="fb-btn up" onclick="sendFeedback('👍')">👍</button>
     <button class="fb-btn down" onclick="sendFeedback('👎')">👎</button>
 </div>
 
-<div class="controls">
-    <button onclick="nextTurn()">beurt afronden</button>
-    <button style="background:#607D8B" onclick="resetAndShuffle()">nieuwe ronde (reset)</button>
+<div class="bottom-nav">
+    <button class="btn-action" onclick="nextTurn()">volgende student</button>
+    <button class="btn-action btn-reset" onclick="resetAndShuffle()">reset (17 nieuwe items)</button>
 </div>
 
 <script type="module">
@@ -112,16 +197,17 @@
     let myName, myClass, isMyTurn = false;
 
     const database = {
-        onderwerpen: ["de hoofdagent", "de roodborst", "de verdachte", "een verwarde cavia", "de korpschef", "de getuige", "de surveillancewagen", "een drone", "de parkeercontroleur", "mijn collega", "de boze buurman", "een loslopende pony", "de centralist", "de motoragent"],
-        pvOVT: ["hield", "zag", "rende", "onderzocht", "vroeg", "observeerde", "schreef", "vond", "hoorde", "pakte", "waarschuwde", "stapte"],
-        ruis_PV_TT: ["houdt", "ziet", "rent", "onderzoekt", "vraagt", "pakt"],
+        onderwerpen: ["de hoofdagent", "de bavianen", "de verdachte", "een verwarde cavia", "de korpschef", "de dwergpapegaai", "de pizzabezorger", "de motoragent", "de goudvis", "de wijkagent", "de boze burger", "de surveillancewagen"],
+        pvOVT: ["hield", "zag", "rende", "onderzocht", "vroeg", "observeerde", "schreef", "vond", "hoorde", "pakte", "waarschuwde", "stapte", "sloopte", "verstopte", "besloop", "glibberde"],
+        ruis_PV_TT: ["houdt", "ziet", "rent", "onderzoekt", "vraagt", "pakt", "slóópt"],
         ruis_HULP: ["heeft", "werd", "is", "was", "worden"],
-        ruis_VD: ["gezien", "gehoord", "gepakt", "aangehouden", "onderzocht", "gevonden"],
-        objecten: ["de gestolen tas", "de verdachte", "een zak chips", "de legitimatie", "het proces-verbaal", "de dienstfiets", "de achterdeur"],
-        bepalingen: ["gisteren", "onmiddellijk", "in de kalverstraat", "met een noodgang", "zonder aarzelen", "in het holst van de nacht"]
+        ruis_VD: ["gezien", "gehoord", "gepakt", "aangehouden", "onderzocht", "gesloopt"],
+        objecten: ["de mandarijnen", "de stoflappen", "de discobal", "een natte krant", "een opblaasbare eenhoorn", "de legitimatie", "de dienstfiets", "de noodknop"],
+        bepalingen: ["gisteren", "onmiddellijk", "in de kalverstraat", "met een noodgang", "zonder aarzelen", "in het holst van de nacht"],
+        voorzetsels: ["op", "onder", "naast", "achter", "tegen", "over", "tussen", "vóór", "bij", "met"]
     };
 
-    function generate15Words() {
+    function generate17Words() {
         const pool = [
             ...database.onderwerpen.sort(() => 0.5 - Math.random()).slice(0, 3),
             ...database.pvOVT.sort(() => 0.5 - Math.random()).slice(0, 3),
@@ -129,12 +215,13 @@
             ...database.ruis_HULP.sort(() => 0.5 - Math.random()).slice(0, 2),
             ...database.ruis_VD.sort(() => 0.5 - Math.random()).slice(0, 2),
             ...database.objecten.sort(() => 0.5 - Math.random()).slice(0, 2),
+            ...database.voorzetsels.sort(() => 0.5 - Math.random()).slice(0, 2),
             ...database.bepalingen.sort(() => 0.5 - Math.random()).slice(0, 1)
         ];
         return pool.sort(() => 0.5 - Math.random()).map((text, i) => ({
             id: 'w' + i + Date.now(), text: text,
-            x: 50 + (Math.random() * (window.innerWidth - 300)),
-            y: 50 + (Math.random() * (window.innerHeight * 0.3))
+            x: 60 + (Math.random() * (window.innerWidth - 350)),
+            y: 40 + (Math.random() * (window.innerHeight * 0.35))
         }));
     }
 
@@ -150,7 +237,7 @@
         const gameRef = ref(db, `draggames/${myClass}`);
         const snap = await get(gameRef);
         if(!snap.exists()) {
-            await set(gameRef, { words: generate15Words(), currentTurn: myName, players: [myName], lastFeedback: { emoji: "", user: "" } });
+            await set(gameRef, { words: generate17Words(), currentTurn: myName, players: [myName], lastFeedback: { emoji: "", user: "", fbTime: 0 } });
         } else {
             const players = snap.val().players || [];
             if(!players.includes(myName)) { players.push(myName); await update(gameRef, { players }); }
@@ -168,36 +255,37 @@
                 el.onmousedown = (e) => startDrag(e, index);
                 area.appendChild(el);
             });
-            if(data.lastFeedback && data.lastFeedback.emoji) {
+            if(data.lastFeedback && data.lastFeedback.fbTime > 0) {
                 const visual = document.getElementById('feedback-visual');
                 document.getElementById('fb-emoji').innerText = data.lastFeedback.emoji;
-                document.getElementById('fb-user').innerText = data.lastFeedback.user;
-                visual.classList.remove('animate-feedback');
+                document.getElementById('fb-user').innerText = "door: " + data.lastFeedback.user;
+                visual.classList.remove('animate-fb');
                 void visual.offsetWidth; 
-                visual.classList.add('animate-feedback');
+                visual.classList.add('animate-fb');
             }
             updateTurnDisplay(data.currentTurn);
         });
     }
 
     window.sendFeedback = function(emoji) {
-        update(ref(db, `draggames/${myClass}`), { lastFeedback: { emoji: emoji, user: myName, time: Date.now() } });
+        update(ref(db, `draggames/${myClass}/lastFeedback`), { 
+            emoji: emoji, user: myName, fbTime: Date.now() 
+        });
     };
 
     function updateTurnDisplay(turn) {
         isMyTurn = (turn === myName);
         const display = document.getElementById('turn-display');
-        display.innerText = isMyTurn ? "jouw beurt: vorm een filmische zin" : `beurt van: ${turn.toUpperCase()} - geef feedback!`;
+        display.innerText = isMyTurn ? "U BENT DE FEEDBACK-ONTVANGER - BOUW EEN ZIN" : `STUDENT AAN HET WERK: ${turn.toUpperCase()} | GEEF FEEDBACK`;
         display.style.background = isMyTurn ? "var(--succes)" : "var(--korps-blauw)";
     }
 
     function startDrag(e, index) {
         if(!isMyTurn) return;
+        const rect = document.getElementById('game-area').getBoundingClientRect();
         document.onmousemove = (ev) => {
-            const rect = document.getElementById('game-area').getBoundingClientRect();
             update(ref(db, `draggames/${myClass}/words/${index}`), { 
-                x: ev.clientX - rect.left - 40, 
-                y: ev.clientY - rect.top - 20 
+                x: ev.clientX - rect.left - 45, y: ev.clientY - rect.top - 20 
             });
         };
         document.onmouseup = () => document.onmousemove = null;
@@ -208,12 +296,12 @@
         const snap = await get(ref(db, `draggames/${myClass}`));
         const players = snap.val().players;
         let ni = (players.indexOf(myName) + 1) % players.length;
-        update(ref(db, `draggames/${myClass}`), { currentTurn: players[ni], lastFeedback: { emoji: "", user: "" } });
+        update(ref(db, `draggames/${myClass}`), { currentTurn: players[ni], lastFeedback: { emoji: "", user: "", fbTime: 0 } });
     };
 
     window.resetAndShuffle = () => {
-        if(confirm("nieuwe ronde starten?")) {
-            update(ref(db, `draggames/${myClass}`), { words: generate15Words(), lastFeedback: { emoji: "", user: "" } });
+        if(confirm("wilt u 17 nieuwe fragmenten genereren voor deze eenheid?")) {
+            update(ref(db, `draggames/${myClass}`), { words: generate17Words(), lastFeedback: { emoji: "", user: "", fbTime: 0 } });
         }
     };
 </script>
