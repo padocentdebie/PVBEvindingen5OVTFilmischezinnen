@@ -2,71 +2,98 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>Filmisch Rapporteren: De OVT-Puzzel</title>
+    <title>filmisch rapporteren: de ovt-puzzel</title>
     <style>
-        :root { --korps-blauw: #002C52; --accent: #004682; --achtergrond: #F4F7F9; --wit: #FFFFFF; --grijs: #D1D5DB; }
+        :root { --korps-blauw: #002C52; --accent: #004682; --achtergrond: #F4F7F9; --wit: #FFFFFF; --grijs: #D1D5DB; --succes: #2E7D32; --fout: #d32f2f; }
         body { font-family: Arial, sans-serif; background: var(--achtergrond); margin: 0; padding: 20px; overflow: hidden; }
-        .sectie-card { background: var(--wit); padding: 20px; border: 1px solid var(--grijs); border-radius: 2px; margin-bottom: 10px; }
-        h1 { color: var(--korps-blauw); border-bottom: 2px solid var(--korps-blauw); padding-bottom: 5px; font-size: 20px; margin-top: 0; }
-        .instructie-blok { background: #E1E8ED; border-left: 4px solid var(--korps-blauw); padding: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.4; }
+        .sectie-card { background: var(--wit); padding: 15px; border: 1px solid var(--grijs); border-radius: 2px; margin-bottom: 10px; }
+        h1 { color: var(--korps-blauw); border-bottom: 2px solid var(--korps-blauw); padding-bottom: 5px; font-size: 18px; margin-top: 0; text-transform: lowercase; }
+        .instructie-blok { background: #E1E8ED; border-left: 4px solid var(--korps-blauw); padding: 10px; margin-bottom: 10px; font-size: 12px; line-height: 1.4; }
+        
         #game-area { 
-            position: relative; width: 100%; height: 55vh; 
+            position: relative; width: 100%; height: 50vh; 
             background: var(--wit); border: 2px solid var(--korps-blauw); 
             overflow: hidden; background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 30px 30px;
         }
+        
         .word-box { 
             position: absolute; padding: 8px 12px; background: #fff; 
             border: 1px solid var(--korps-blauw); cursor: grab; user-select: none;
             font-size: 13px; font-weight: bold; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            white-space: nowrap;
+            white-space: nowrap; z-index: 10; text-transform: lowercase;
         }
         .word-box:active { cursor: grabbing; z-index: 1000; border-color: #ff9800; }
+        
         .status-bar { background: var(--korps-blauw); color: white; padding: 10px; text-align: center; font-weight: bold; font-size: 13px; margin-bottom: 10px; }
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--achtergrond); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        
+        .feedback-container {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; pointer-events: none; opacity: 0; z-index: 2000;
+        }
+        .feedback-emoji { font-size: 80px; display: block; }
+        .feedback-name { font-size: 20px; font-weight: bold; color: var(--korps-blauw); background: rgba(255,255,255,0.8); padding: 5px 15px; border-radius: 20px; }
+        
+        @keyframes popFeedback { 
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 
+        }
+        .animate-feedback { animation: popFeedback 2.5s ease-in-out forwards; }
+
+        .feedback-buttons { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 3000; }
+        .fb-btn { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; font-size: 25px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .up { background: var(--succes); color: white; }
+        .down { background: var(--fout); color: white; }
+
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--achtergrond); z-index: 4000; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--wit); padding: 30px; border: 1px solid var(--grijs); width: 320px; text-align: center; }
         input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--grijs); }
         .controls { margin-top: 15px; text-align: center; display: flex; justify-content: center; gap: 10px; }
         button { background: var(--korps-blauw); color: white; border: none; padding: 12px 20px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 11px; }
-        .btn-reset { background: #d32f2f; }
     </style>
 </head>
 <body>
 
 <div id="login-overlay">
     <div class="login-card">
-        <h3>Politieschool: OVT Training</h3>
-        <p style="font-size: 12px;">Log in voor de training 'Filmisch Rapporteren'.</p>
-        <input type="text" id="username" placeholder="Naam">
+        <h3>politieschool: ovt training</h3>
+        <input type="text" id="username" placeholder="naam">
         <select id="userclass">
-            <option value="">-- Kies klas --</option>
-            <option value="delta">Delta</option>
-            <option value="echo">Echo</option>
-            <option value="foxtrot">Foxtrot</option>
-            <option value="golf">Golf</option>
-            <option value="hotel">Hotel</option>
-            <option value="lima">Lima</option>
-            <option value="mike">Mike</option>
+            <option value="">-- kies klas --</option>
+            <option value="delta">delta</option><option value="echo">echo</option><option value="foxtrot">foxtrot</option>
+            <option value="golf">golf</option><option value="hotel">hotel</option><option value="lima">lima</option><option value="mike">mike</option>
         </select>
-        <button style="width:100%" onclick="joinGame()">Start Sessie</button>
+        <button style="width:100%" onclick="joinGame()">start sessie</button>
     </div>
 </div>
 
 <div class="sectie-card">
-    <h1>Vakvaardigheid: Filmisch Rapporteren (OVT)</h1>
+    <h1>filmisch rapporteren: ovt check</h1>
     <div class="instructie-blok">
-        <strong>Opdracht:</strong> Sleep de fragmenten om een actieve, filmische zin te bouwen.
-        <br>1. Gebruik uitsluitend de <strong>Onvoltooid Verleden Tijd (OVT)</strong>.
-        <br>2. Vermijd hulpwerkwoorden (is, heeft, wordt) en voltooid deelwoorden.
-        <br>3. De rest van de klas controleert of de zin grammaticaal én filmisch correct is.
+        <strong>let op:</strong> alle blokken zijn in kleine letters om sturing te voorkomen. 
+        <br>1. vorm een zin in de <strong>ovt</strong>.
+        <br>2. denk bij het presenteren aan de juiste <strong>hoofdletters</strong> en spelling.
+        <br>3. feedbackgevers: let op of de zin filmisch is én of de grammatica klopt!
     </div>
-    <div id="turn-display" class="status-bar">Wachten op verbinding...</div>
+    <div id="turn-display" class="status-bar">laden...</div>
 </div>
 
-<div id="game-area"></div>
+<div id="game-area">
+    <div id="feedback-visual" class="feedback-container">
+        <span id="fb-emoji" class="feedback-emoji"></span>
+        <span id="fb-user" class="feedback-name"></span>
+    </div>
+</div>
+
+<div class="feedback-buttons">
+    <button class="fb-btn up" onclick="sendFeedback('👍')">👍</button>
+    <button class="fb-btn down" onclick="sendFeedback('👎')">👎</button>
+</div>
 
 <div class="controls">
-    <button onclick="nextTurn()">Beurt Afronden</button>
-    <button class="btn-reset" onclick="resetAndShuffle()">Systeem Reset (Nieuwe Ronde)</button>
+    <button onclick="nextTurn()">beurt afronden</button>
+    <button style="background:#607D8B" onclick="resetAndShuffle()">nieuwe ronde (reset)</button>
 </div>
 
 <script type="module">
@@ -85,13 +112,13 @@
     let myName, myClass, isMyTurn = false;
 
     const database = {
-        onderwerpen: ["De hoofdagent", "De roodborst", "De verdachte", "Een verwarde cavia", "De korpschef", "De getuige", "De surveillancewagen", "Een drone", "De parkeercontroleur", "Mijn collega", "De boze buurman", "Een loslopende pony", "De centralist", "De motoragent", "De wijkagent", "Een boze burger"],
-        pvOVT: ["hield", "zag", "rende", "onderzocht", "vroeg", "observeerde", "schreef", "vond", "hoorde", "pakte", "waarschuwde", "stapte", "riep", "achtervolgde", "opende", "benaderde"],
-        ruis_PV_TT: ["houdt", "ziet", "rent", "onderzoekt", "vraagt", "pakt", "stapt", "roept", "zoekt", "waarschuwt"],
-        ruis_HULP: ["heeft", "werd", "is", "was", "hadden", "worden", "zijn", "wordt"],
-        ruis_VD: ["gezien", "gehoord", "gepakt", "aangehouden", "onderzocht", "gevonden", "gerend", "gevraagd", "geobserveerd"],
-        objecten: ["de gestolen tas", "de verdachte", "een zak chips", "de legitimatie", "het proces-verbaal", "de dienstfiets", "een natte krant", "de achterdeur", "het signalement", "de noodknop"],
-        bepalingen: ["gisteren", "onmiddellijk", "in de Kalverstraat", "met een noodgang", "tijdens de fouillering", "zonder aarzelen", "in het holst van de nacht", "met luide stem", "ter hoogte van de markt"]
+        onderwerpen: ["de hoofdagent", "de roodborst", "de verdachte", "een verwarde cavia", "de korpschef", "de getuige", "de surveillancewagen", "een drone", "de parkeercontroleur", "mijn collega", "de boze buurman", "een loslopende pony", "de centralist", "de motoragent"],
+        pvOVT: ["hield", "zag", "rende", "onderzocht", "vroeg", "observeerde", "schreef", "vond", "hoorde", "pakte", "waarschuwde", "stapte"],
+        ruis_PV_TT: ["houdt", "ziet", "rent", "onderzoekt", "vraagt", "pakt"],
+        ruis_HULP: ["heeft", "werd", "is", "was", "worden"],
+        ruis_VD: ["gezien", "gehoord", "gepakt", "aangehouden", "onderzocht", "gevonden"],
+        objecten: ["de gestolen tas", "de verdachte", "een zak chips", "de legitimatie", "het proces-verbaal", "de dienstfiets", "de achterdeur"],
+        bepalingen: ["gisteren", "onmiddellijk", "in de kalverstraat", "met een noodgang", "zonder aarzelen", "in het holst van de nacht"]
     };
 
     function generate15Words() {
@@ -104,11 +131,10 @@
             ...database.objecten.sort(() => 0.5 - Math.random()).slice(0, 2),
             ...database.bepalingen.sort(() => 0.5 - Math.random()).slice(0, 1)
         ];
-        return pool.sort(() => 0.5 - Math.random()).slice(0,15).map((text, i) => ({
-            id: 'w' + i + '_' + Date.now(), // Unieke ID voor schone re-render
-            text: text,
-            x: 50 + (Math.random() * (window.innerWidth - 250)),
-            y: 50 + (Math.random() * (window.innerHeight * 0.35))
+        return pool.sort(() => 0.5 - Math.random()).map((text, i) => ({
+            id: 'w' + i + Date.now(), text: text,
+            x: 50 + (Math.random() * (window.innerWidth - 300)),
+            y: 50 + (Math.random() * (window.innerHeight * 0.3))
         }));
     }
 
@@ -124,53 +150,57 @@
         const gameRef = ref(db, `draggames/${myClass}`);
         const snap = await get(gameRef);
         if(!snap.exists()) {
-            await set(gameRef, { words: generate15Words(), currentTurn: myName, players: [myName] });
+            await set(gameRef, { words: generate15Words(), currentTurn: myName, players: [myName], lastFeedback: { emoji: "", user: "" } });
         } else {
             const players = snap.val().players || [];
-            if(!players.includes(myName)) {
-                players.push(myName);
-                await update(gameRef, { players: players });
-            }
+            if(!players.includes(myName)) { players.push(myName); await update(gameRef, { players }); }
         }
+
         onValue(gameRef, (snapshot) => {
             const data = snapshot.val();
             if(!data) return;
             const area = document.getElementById('game-area');
-            area.innerHTML = ''; 
-            renderWords(data.words);
+            area.querySelectorAll('.word-box').forEach(el => el.remove());
+            data.words.forEach((w, index) => {
+                const el = document.createElement('div');
+                el.className = 'word-box'; el.innerText = w.text;
+                el.style.left = w.x + 'px'; el.style.top = w.y + 'px';
+                el.onmousedown = (e) => startDrag(e, index);
+                area.appendChild(el);
+            });
+            if(data.lastFeedback && data.lastFeedback.emoji) {
+                const visual = document.getElementById('feedback-visual');
+                document.getElementById('fb-emoji').innerText = data.lastFeedback.emoji;
+                document.getElementById('fb-user').innerText = data.lastFeedback.user;
+                visual.classList.remove('animate-feedback');
+                void visual.offsetWidth; 
+                visual.classList.add('animate-feedback');
+            }
             updateTurnDisplay(data.currentTurn);
         });
     }
 
-    function renderWords(words) {
-        const area = document.getElementById('game-area');
-        words.forEach((w, index) => {
-            const el = document.createElement('div');
-            el.id = w.id; el.className = 'word-box'; el.innerText = w.text;
-            el.style.left = w.x + 'px'; el.style.top = w.y + 'px';
-            el.onmousedown = (e) => startDrag(e, w.id, index);
-            area.appendChild(el);
-        });
-    }
+    window.sendFeedback = function(emoji) {
+        update(ref(db, `draggames/${myClass}`), { lastFeedback: { emoji: emoji, user: myName, time: Date.now() } });
+    };
 
     function updateTurnDisplay(turn) {
         isMyTurn = (turn === myName);
         const display = document.getElementById('turn-display');
-        display.innerText = isMyTurn ? "JOUW BEURT: Sleep de fragmenten naar de juiste positie" : `BEURT VAN: ${turn.toUpperCase()} (Kijk mee naar de zinsopbouw)`;
-        display.style.background = isMyTurn ? "#2E7D32" : "#002C52";
+        display.innerText = isMyTurn ? "jouw beurt: vorm een filmische zin" : `beurt van: ${turn.toUpperCase()} - geef feedback!`;
+        display.style.background = isMyTurn ? "var(--succes)" : "var(--korps-blauw)";
     }
 
-    let dragIdx = null;
-    function startDrag(e, id, index) {
+    function startDrag(e, index) {
         if(!isMyTurn) return;
-        dragIdx = index;
         document.onmousemove = (ev) => {
             const rect = document.getElementById('game-area').getBoundingClientRect();
-            let nx = ev.clientX - rect.left - 40;
-            let ny = ev.clientY - rect.top - 20;
-            update(ref(db, `draggames/${myClass}/words/${dragIdx}`), { x: nx, y: ny });
+            update(ref(db, `draggames/${myClass}/words/${index}`), { 
+                x: ev.clientX - rect.left - 40, 
+                y: ev.clientY - rect.top - 20 
+            });
         };
-        document.onmouseup = () => { document.onmousemove = null; dragIdx = null; };
+        document.onmouseup = () => document.onmousemove = null;
     }
 
     window.nextTurn = async function() {
@@ -178,12 +208,12 @@
         const snap = await get(ref(db, `draggames/${myClass}`));
         const players = snap.val().players;
         let ni = (players.indexOf(myName) + 1) % players.length;
-        update(ref(db, `draggames/${myClass}`), { currentTurn: players[ni] });
+        update(ref(db, `draggames/${myClass}`), { currentTurn: players[ni], lastFeedback: { emoji: "", user: "" } });
     };
 
     window.resetAndShuffle = () => {
-        if(confirm("Nieuwe ronde starten voor de hele klas?")) {
-            update(ref(db, `draggames/${myClass}`), { words: generate15Words() });
+        if(confirm("nieuwe ronde starten?")) {
+            update(ref(db, `draggames/${myClass}`), { words: generate15Words(), lastFeedback: { emoji: "", user: "" } });
         }
     };
 </script>
