@@ -6,137 +6,63 @@
     <title>Systeem Filmisch Rapporteren | OVT-Training</title>
     <style>
         :root { 
-            --korps-blauw: #002C52; 
-            --accent: #004682; 
-            --achtergrond: #ECEFF1; 
-            --wit: #FFFFFF; 
-            --grijs-rand: #B0BEC5; 
-            --tekst-donker: #263238;
-            --succes: #388E3C; 
-            --fout: #C62828; 
+            --korps-blauw: #002C52; --accent: #004682; --achtergrond: #ECEFF1; 
+            --wit: #FFFFFF; --grijs-rand: #B0BEC5; --tekst-donker: #263238;
+            --succes: #388E3C; --fout: #C62828; --docent-goud: #FFA000;
         }
 
         body { 
-            font-family: "Segoe UI", Arial, sans-serif; 
-            background: var(--achtergrond); 
-            color: var(--tekst-donker);
-            margin: 0; padding: 20px; 
-            overflow: hidden; 
-            user-select: none;
+            font-family: "Segoe UI", Arial, sans-serif; background: var(--achtergrond); 
+            color: var(--tekst-donker); margin: 0; padding: 20px; overflow: hidden; user-select: none;
         }
 
         .header-container { 
-            background: var(--wit); 
-            padding: 20px; 
-            border: 1px solid var(--grijs-rand); 
-            border-top: 5px solid var(--korps-blauw);
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: var(--wit); padding: 20px; border: 1px solid var(--grijs-rand); 
+            border-top: 5px solid var(--korps-blauw); margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         h1 { margin: 0 0 10px 0; font-size: 20px; color: var(--korps-blauw); text-transform: lowercase; }
 
         .instructie-blok { 
-            background: #F8F9FA; 
-            border-left: 4px solid var(--korps-blauw); 
-            padding: 12px; 
-            font-size: 13px; 
-            line-height: 1.5;
+            background: #F8F9FA; border-left: 4px solid var(--korps-blauw); padding: 12px; font-size: 13px; line-height: 1.5;
         }
 
         #game-area { 
-            position: relative; 
-            width: 100%; 
-            height: 55vh; 
-            background: var(--wit); 
-            border: 1px solid var(--grijs-rand); 
-            border-radius: 4px;
-            overflow: hidden; 
-            background-image: radial-gradient(#CFD8DC 1px, transparent 1px); 
-            background-size: 40px 40px;
+            position: relative; width: 100%; height: 58vh; background: var(--wit); 
+            border: 1px solid var(--grijs-rand); border-radius: 4px; overflow: hidden; 
+            background-image: radial-gradient(#CFD8DC 1px, transparent 1px); background-size: 40px 40px;
         }
 
         .word-box { 
-            position: absolute; 
-            padding: 10px 16px; 
-            background: var(--wit); 
-            border: 1px solid var(--korps-blauw); 
-            cursor: grab; 
-            font-size: 14px; 
-            font-weight: 500; 
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
-            white-space: nowrap; 
-            z-index: 10; 
-            text-transform: lowercase;
-            transition: left 0.1s linear, top 0.1s linear; /* Voor vloeiende weergave bij meekijkers */
+            position: absolute; padding: 10px 16px; background: var(--wit); border: 1px solid var(--korps-blauw); 
+            cursor: grab; font-size: 14px; font-weight: 500; box-shadow: 2px 2px 8px rgba(0,0,0,0.08);
+            white-space: nowrap; z-index: 10;
+            transition: left 0.1s linear, top 0.1s linear;
         }
         
-        .word-box.active-drag { 
-            cursor: grabbing; 
-            z-index: 1000; 
-            border-color: #FF9800; 
-            transition: none; /* Geen vertraging voor de sleper zelf */
-        }
+        .word-box.active-drag { cursor: grabbing; z-index: 1000; border-color: #FF9800; transition: none !important; }
 
         .status-bar { 
-            background: var(--korps-blauw); 
-            color: white; 
-            padding: 12px; 
-            text-align: center; 
-            font-weight: bold; 
-            font-size: 14px; 
-            margin-top: 10px;
-            border-radius: 2px;
+            background: var(--korps-blauw); color: white; padding: 12px; text-align: center; 
+            font-weight: bold; font-size: 14px; margin-top: 10px; border-radius: 2px;
         }
 
-        .feedback-overlay {
-            position: absolute; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%);
-            text-align: center; pointer-events: none; 
-            opacity: 0; z-index: 2000;
-        }
-        .fb-emoji { font-size: 90px; display: block; filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.2)); }
-        .fb-name { 
-            font-size: 18px; font-weight: bold; color: var(--korps-blauw); 
-            background: rgba(255,255,255,0.95); padding: 8px 25px; 
-            border-radius: 40px; border: 2px solid var(--korps-blauw);
-            display: inline-block; margin-top: 10px;
-        }
-        
-        @keyframes popInFeedback { 
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 
-            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 
-        }
-        .animate-fb { animation: popInFeedback 2.8s ease-in-out forwards; }
-
-        .side-controls { 
-            position: fixed; right: 25px; top: 50%; 
-            transform: translateY(-50%); 
-            display: flex; flex-direction: column; gap: 20px; 
-        }
-        .fb-btn { 
-            width: 65px; height: 65px; border-radius: 50%; border: none; 
-            cursor: pointer; font-size: 30px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
-        }
-        .fb-btn:active { transform: scale(0.9); }
+        .side-controls { position: fixed; right: 25px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; }
+        .fb-btn { width: 65px; height: 65px; border-radius: 50%; border: none; cursor: pointer; font-size: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .up { background: var(--succes); color: white; }
         .down { background: var(--fout); color: white; }
 
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--achtergrond); z-index: 4000; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--wit); padding: 40px; border: 1px solid var(--grijs-rand); width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--korps-blauw); }
-        input, select { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--grijs-rand); box-sizing: border-box; font-size: 14px; }
         
-        .bottom-nav { margin-top: 20px; text-align: center; display: flex; justify-content: center; gap: 15px; }
-        .btn-action { 
-            background: var(--korps-blauw); color: white; border: none; 
-            padding: 14px 25px; cursor: pointer; font-weight: bold; 
-            text-transform: uppercase; font-size: 12px; letter-spacing: 1px;
-        }
-        .btn-reset { background: #546E7A; }
+        input, select { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--grijs-rand); box-sizing: border-box; font-size: 14px; }
+        .btn-action { background: var(--korps-blauw); color: white; border: none; padding: 14px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        
+        #teacher-controls { display: none; margin-top: 15px; padding: 15px; background: var(--docent-goud); border-radius: 4px; text-align: center; border: 2px solid var(--korps-blauw); }
+        
+        .feedback-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; opacity: 0; z-index: 2000; text-align: center; }
+        .animate-fb { animation: pop 2.5s forwards; }
+        @keyframes pop { 0% {opacity:0; transform: translate(-50%, -50%) scale(0.5);} 15% {opacity:1; transform: translate(-50%, -50%) scale(1.1);} 85% {opacity:1; transform: translate(-50%, -50%) scale(1);} 100% {opacity:0; transform: translate(-50%, -50%) scale(0.8);} }
     </style>
 </head>
 <body>
@@ -148,9 +74,17 @@
         <input type="text" id="username" placeholder="naam student">
         <select id="userclass">
             <option value="">-- kies eenheid --</option>
-            <option value="delta">delta</option><option value="echo">echo</option>
-            <option value="foxtrot">foxtrot</option><option value="golf">golf</option>
-            <option value="hotel">hotel</option><option value="lima">lima</option>
+            <option value="alpha">alpha</option>
+            <option value="bravo">bravo</option>
+            <option value="charlie">charlie</option>
+            <option value="delta">delta</option>
+            <option value="echo">echo</option>
+            <option value="foxtrot">foxtrot</option>
+            <option value="golf">golf</option>
+            <option value="hotel">hotel</option>
+            <option value="juliett">juliett</option>
+            <option value="kilo">kilo</option>
+            <option value="lima">lima</option>
             <option value="mike">mike</option>
         </select>
         <button class="btn-action" style="width:100%" onclick="joinGame()">systeem betreden</button>
@@ -158,29 +92,28 @@
 </div>
 
 <div class="header-container">
-    <h1>filmisch rapporteren: de ovt-puzzel</h1>
+    <h1>filmisch rapporteren: de live puzzel</h1>
     <div class="instructie-blok">
-        <strong>instructie:</strong> gebruik de fragmenten om een <u>filmische</u> zin in de <strong>ovt</strong> te vormen. 
-        <br>geen hoofdletters aanwezig: bedenk de juiste spelling tijdens de mondelinge toelichting.
+        <strong>opdracht:</strong> sleep de fragmenten om een <u>filmische</u> zin in de <strong>ovt</strong> te vormen. Observeer de PD-situatie en rapporteer objectief.
+        <br>let op spelling: straatnamen hebben hoofdletters, de rest is didactisch klein geschreven.
+    </div>
+    <div id="teacher-controls">
+        <strong style="color:var(--korps-blauw)">CONTROLE PANEEL DOCENT</strong><br>
+        <button class="btn-action" style="background:var(--korps-blauw); margin-top:10px" onclick="teacherNextStudent()">Volgende Student & Nieuwe Fragmenten</button>
     </div>
     <div id="turn-display" class="status-bar">verbinding maken met database...</div>
 </div>
 
 <div id="game-area">
     <div id="feedback-visual" class="feedback-overlay">
-        <span id="fb-emoji" class="fb-emoji"></span>
-        <span id="fb-user" class="fb-name"></span>
+        <span id="fb-emoji" style="font-size:90px; display:block;"></span>
+        <span id="fb-user" style="background:rgba(255,255,255,0.9); padding:8px 25px; border-radius:40px; border:2px solid var(--korps-blauw); font-weight:bold;"></span>
     </div>
 </div>
 
 <div class="side-controls">
     <button class="fb-btn up" onclick="sendFeedback('👍')">👍</button>
     <button class="fb-btn down" onclick="sendFeedback('👎')">👎</button>
-</div>
-
-<div class="bottom-nav">
-    <button class="btn-action" onclick="nextTurn()">volgende student</button>
-    <button class="btn-action btn-reset" onclick="resetAndShuffle()">reset (nieuwe fragmenten)</button>
 </div>
 
 <script type="module">
@@ -196,147 +129,162 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    let myName, myClass, isMyTurn = false;
-    let draggingIndex = -1;
+    let myName, myClass, isMyTurn = false, draggingIndex = -1;
 
     const database = {
-        onderwerpen: ["de hoofdagent", "de bavianen", "de verdachte", "een verwarde cavia", "de korpschef", "de dwergpapegaai", "de pizzabezorger", "de motoragent", "de goudvis", "de wijkagent", "de boze burger", "de surveillancewagen", "de officier van dienst", "een getuige met een hoed"],
-        pvOVT: ["hield", "zag", "rende", "onderzocht", "vroeg", "observeerde", "schreef", "vond", "hoorde", "pakte", "waarschuwde", "stapte", "sloopte", "verstopte", "besloop", "glibberde", "trapten", "sprong"],
-        ruis_PV_TT: ["houdt", "ziet", "rent", "onderzoekt", "vraagt", "pakt", "slóópt", "springt"],
-        ruis_HULP: ["heeft", "werd", "is", "was", "worden", "zijn"],
-        ruis_VD: ["gezien", "gehoord", "gepakt", "aangehouden", "onderzocht", "gesloopt", "geobserveerd"],
-        objecten: ["de mandarijnen", "de stoflappen", "de discobal", "een natte krant", "een opblaasbare eenhoorn", "de legitimatie", "de dienstfiets", "de noodknop", "het proces-verbaal", "de handboeien"],
-        bepalingen: ["gisteren", "onmiddellijk", "in de kalverstraat", "met een noodgang", "zonder aarzelen", "in het holst van de nacht", "onder de brug", "tijdens de briefing"],
-        voorzetsels: ["op", "onder", "naast", "achter", "tegen", "over", "tussen", "vóór", "bij", "met"]
+        onderwerp: [
+            "de hoofdagent", "de verdachte", "de dwergpapegaai", "de korpschef", "de pizzabezorger", "een verwarde cavia", "de wijkagent", "de paashaas", "de surveillancewagen", "een vliegende schotel",
+            "de hoofdagenten", "de verdachten", "de dwergpapegaaien", "de korpschefs", "de pizzabezorgers", "verwarde cavia's", "de wijkagenten", "de paashazen", "de surveillancewagens", "vliegende schotels"
+        ],
+        pv_tt: ["hanteert", "ziet", "hoort", "onderzoekt", "pakt", "stopt", "vraagt", "observeert", "eet", "danst"],
+        pv_ovt: [
+            "hanteerde", "hanteerden", "zag", "zagen", "hoorde", "hoorden", "onderzocht", "onderzochten", "pakte", "pakten", "stopte", "stopten", 
+            "vroeg", "vroegen", "observeerde", "observeerden", "besloop", "beslopen", "glibberde", "glibberden", "sprong", "sprongen", "verstopte", "verstopten"
+        ],
+        hulp: ["heeft", "had", "wordt", "mocht", "is", "was", "werd", "zijn", "worden", "kan", "mag", "hadden", "waren"],
+        lijdend: ["de handboeien", "de legitimatie", "de vluchtauto", "de opblaasbare eenhoorn", "een natte krant", "de discobal", "de mandarijnen", "het proces-verbaal"],
+        meewerkend: ["de korpschef", "de officier", "de goudvis", "de dwergpapegaai", "de slachtoffers", "de verdachte", "de buurvrouw"],
+        preps: ["aan", "voor", "met", "tegen", "bij", "over", "onder", "tussen"],
+        vd: ["gepakt", "gezien", "gehoord", "geadopteerd", "geobserveerd", "vastgesteld", "gefeliciteerd", "aangehouden"],
+        omstandigheid: ["gisteren", "onmiddellijk", "in de Kalverstraat", "met een noodgang", "op de Maan", "in het holst van de nacht", "op de Coolsingel", "zonder aarzelen", "tijdens de polonaise", "op het Damrak"]
     };
 
-    function generate17Words() {
+    function generateNewWords() {
         const pool = [
-            ...database.onderwerpen.sort(() => 0.5 - Math.random()).slice(0, 3),
-            ...database.pvOVT.sort(() => 0.5 - Math.random()).slice(0, 3),
-            ...database.ruis_PV_TT.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.ruis_HULP.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.ruis_VD.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.objecten.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.voorzetsels.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.bepalingen.sort(() => 0.5 - Math.random()).slice(0, 1)
+            ...database.onderwerp.sort(() => 0.5 - Math.random()).slice(0, 2),
+            ...database.pv_tt.sort(() => 0.5 - Math.random()).slice(0, 2),
+            ...database.pv_ovt.sort(() => 0.5 - Math.random()).slice(0, 3),
+            ...database.hulp.sort(() => 0.5 - Math.random()).slice(0, 2),
+            ...database.lijdend.sort(() => 0.5 - Math.random()).slice(0, 2),
+            ...database.preps.sort(() => 0.5 - Math.random()).slice(0, 2),
+            ...database.vd.sort(() => 0.5 - Math.random()).slice(0, 2),
+            ...database.omstandigheid.sort(() => 0.5 - Math.random()).slice(0, 2)
         ];
         return pool.sort(() => 0.5 - Math.random()).map((text, i) => ({
             text: text,
-            x: 50 + (Math.random() * (window.innerWidth - 300)),
-            y: 30 + (Math.random() * (window.innerHeight * 0.4))
+            x: 80 + (Math.random() * (window.innerWidth - 320)),
+            y: 50 + (Math.random() * 260)
         }));
     }
 
     window.joinGame = function() {
-        myName = document.getElementById('username').value.trim();
+        myName = document.getElementById('username').value.trim().toLowerCase();
         myClass = document.getElementById('userclass').value;
         if(!myName || !myClass) return;
         document.getElementById('login-overlay').style.display = 'none';
-        initGame();
+        if(myName === 'docent') document.getElementById('teacher-controls').style.display = 'block';
+        initSync();
     };
 
-    async function initGame() {
+    async function initSync() {
         const gameRef = ref(db, `draggames/${myClass}`);
         const snap = await get(gameRef);
         if(!snap.exists()) {
-            await set(gameRef, { words: generate17Words(), currentTurn: myName, players: [myName], lastFeedback: { emoji: "", user: "", fbTime: 0 } });
+            await set(gameRef, { words: generateNewWords(), currentTurn: myName, players: [myName] });
         } else {
             const players = snap.val().players || [];
-            if(!players.includes(myName)) { players.push(myName); await update(gameRef, { players }); }
+            if(!players.includes(myName)) {
+                players.push(myName);
+                await update(gameRef, { players });
+            }
         }
-
         onValue(gameRef, (snapshot) => {
             const data = snapshot.val();
             if(!data) return;
-            const area = document.getElementById('game-area');
-            
-            data.words.forEach((w, index) => {
-                if (draggingIndex === index) return; // Sla over als we zelf aan het slepen zijn
-
-                let el = document.getElementById(`word-${index}`);
-                if (!el) {
-                    el = document.createElement('div');
-                    el.id = `word-${index}`;
-                    el.className = 'word-box';
-                    el.onmousedown = (e) => startDrag(e, index);
-                    area.appendChild(el);
-                }
-                el.innerText = w.text;
-                el.style.left = w.x + 'px';
-                el.style.top = w.y + 'px';
-            });
-
-            if(data.lastFeedback && data.lastFeedback.fbTime > 0) {
-                const visual = document.getElementById('feedback-visual');
-                document.getElementById('fb-emoji').innerText = data.lastFeedback.emoji;
-                document.getElementById('fb-user').innerText = "door: " + data.lastFeedback.user;
-                visual.classList.remove('animate-fb');
-                void visual.offsetWidth; 
-                visual.classList.add('animate-fb');
-            }
+            renderWords(data.words);
             updateTurnDisplay(data.currentTurn);
+            handleFeedback(data.lastFeedback);
+        });
+    }
+
+    function renderWords(words) {
+        const area = document.getElementById('game-area');
+        words.forEach((w, i) => {
+            if(draggingIndex === i) return; 
+            let el = document.getElementById(`word-${i}`);
+            if(!el) {
+                el = document.createElement('div');
+                el.id = `word-${i}`;
+                el.className = 'word-box';
+                el.onmousedown = (e) => startDrag(e, i);
+                el.ontouchstart = (e) => startDrag(e, i);
+                area.appendChild(el);
+            }
+            el.innerText = w.text;
+            el.style.left = w.x + 'px';
+            el.style.top = w.y + 'px';
         });
     }
 
     function startDrag(e, index) {
-        if(!isMyTurn) return;
         draggingIndex = index;
-        
-        const area = document.getElementById('game-area');
         const el = document.getElementById(`word-${index}`);
         el.classList.add('active-drag');
+        const rect = document.getElementById('game-area').getBoundingClientRect();
         
-        const rect = area.getBoundingClientRect();
-        const startX = e.clientX - el.getBoundingClientRect().left;
-        const startY = e.clientY - el.getBoundingClientRect().top;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const offsetX = clientX - el.getBoundingClientRect().left;
+        const offsetY = clientY - el.getBoundingClientRect().top;
 
-        document.onmousemove = (ev) => {
-            const x = ev.clientX - rect.left - startX;
-            const y = ev.clientY - rect.top - startY;
-            
-            // Lokale update voor directe respons
+        const moveHandler = (ev) => {
+            const curX = ev.touches ? ev.touches[0].clientX : ev.clientX;
+            const curY = ev.touches ? ev.touches[0].clientY : ev.clientY;
+            const x = curX - rect.left - offsetX;
+            const y = curY - rect.top - offsetY;
             el.style.left = x + 'px';
             el.style.top = y + 'px';
-
-            // Firebase update voor de klas
-            update(ref(db, `draggames/${myClass}/words/${index}`), { x: x, y: y });
+            update(ref(db, `draggames/${myClass}/words/${index}`), { x, y });
         };
 
-        document.onmouseup = () => {
-            document.onmousemove = null;
+        const stopHandler = () => {
+            document.removeEventListener('mousemove', moveHandler);
+            document.removeEventListener('mouseup', stopHandler);
+            document.removeEventListener('touchmove', moveHandler);
+            document.removeEventListener('touchend', stopHandler);
             el.classList.remove('active-drag');
             draggingIndex = -1;
         };
+
+        document.addEventListener('mousemove', moveHandler);
+        document.addEventListener('mouseup', stopHandler);
+        document.addEventListener('touchmove', moveHandler, { passive: false });
+        document.addEventListener('touchend', stopHandler);
     }
 
-    window.sendFeedback = function(emoji) {
-        update(ref(db, `draggames/${myClass}/lastFeedback`), { emoji: emoji, user: myName, fbTime: Date.now() });
-    };
+    window.teacherNextStudent = async function() {
+        const snap = await get(ref(db, `draggames/${myClass}`));
+        const data = snap.val();
+        const players = data.players.filter(p => p !== 'docent');
+        if(players.length === 0) return alert("Geen studenten aanwezig.");
+        let nextIndex = (players.indexOf(data.currentTurn) + 1) % players.length;
+        await update(ref(db, `draggames/${myClass}`), {
+            currentTurn: players[nextIndex],
+            words: generateNewWords(),
+            lastFeedback: null
+        });
+    }
 
     function updateTurnDisplay(turn) {
         isMyTurn = (turn === myName);
         const display = document.getElementById('turn-display');
-        display.innerText = isMyTurn ? "U BENT DE FEEDBACK-ONTVANGER - BOUW EEN ZIN" : `STUDENT AAN HET WERK: ${turn.toUpperCase()} | GEEF FEEDBACK`;
+        display.innerText = isMyTurn ? "U BENT AAN DE BEURT - BOUW EEN ZIN" : `STUDENT AAN HET WERK: ${turn.toUpperCase()}`;
         display.style.background = isMyTurn ? "var(--succes)" : "var(--korps-blauw)";
     }
 
-    window.nextTurn = async function() {
-        if(!isMyTurn) return;
-        const snap = await get(ref(db, `draggames/${myClass}`));
-        const players = snap.val().players;
-        let ni = (players.indexOf(myName) + 1) % players.length;
-        update(ref(db, `draggames/${myClass}`), { currentTurn: players[ni], lastFeedback: { emoji: "", user: "", fbTime: 0 } });
+    window.sendFeedback = function(emoji) {
+        update(ref(db, `draggames/${myClass}/lastFeedback`), { emoji, user: myName, time: Date.now() });
     };
 
-    window.resetAndShuffle = () => {
-        if(confirm("wilt u nieuwe fragmenten genereren voor deze eenheid?")) {
-            const area = document.getElementById('game-area');
-            // Verwijder alleen de oude woorden, laat de feedback-visual staan
-            area.querySelectorAll('.word-box').forEach(el => el.remove());
-            update(ref(db, `draggames/${myClass}`), { words: generate17Words(), lastFeedback: { emoji: "", user: "", fbTime: 0 } });
-        }
-    };
+    function handleFeedback(fb) {
+        if(!fb) return;
+        const visual = document.getElementById('feedback-visual');
+        document.getElementById('fb-emoji').innerText = fb.emoji;
+        document.getElementById('fb-user').innerText = "door: " + fb.user;
+        visual.classList.remove('animate-fb');
+        void visual.offsetWidth;
+        visual.classList.add('animate-fb');
+    }
 </script>
 </body>
 </html>
