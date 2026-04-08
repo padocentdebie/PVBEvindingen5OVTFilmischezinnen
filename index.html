@@ -74,18 +74,9 @@
         <input type="text" id="username" placeholder="naam student">
         <select id="userclass">
             <option value="">-- kies eenheid --</option>
-            <option value="alpha">alpha</option>
-            <option value="bravo">bravo</option>
-            <option value="charlie">charlie</option>
-            <option value="delta">delta</option>
-            <option value="echo">echo</option>
-            <option value="foxtrot">foxtrot</option>
-            <option value="golf">golf</option>
-            <option value="hotel">hotel</option>
-            <option value="juliett">juliett</option>
-            <option value="kilo">kilo</option>
-            <option value="lima">lima</option>
-            <option value="mike">mike</option>
+            <option value="alpha">alpha</option><option value="bravo">bravo</option><option value="charlie">charlie</option>
+            <option value="delta">delta</option><option value="echo">echo</option><option value="foxtrot">foxtrot</option>
+            <option value="golf">golf</option><option value="hotel">hotel</option><option value="lima">lima</option><option value="mike">mike</option>
         </select>
         <button class="btn-action" style="width:100%" onclick="joinGame()">systeem betreden</button>
     </div>
@@ -94,14 +85,14 @@
 <div class="header-container">
     <h1>filmisch rapporteren: de live puzzel</h1>
     <div class="instructie-blok">
-        <strong>opdracht:</strong> sleep de fragmenten om een <u>filmische</u> zin in de <strong>ovt</strong> te vormen. Observeer de PD-situatie en rapporteer objectief.
-        <br>let op spelling: straatnamen hebben hoofdletters, de rest is didactisch klein geschreven.
+        <strong>opdracht:</strong> sleep de fragmenten om een <u>filmische</u> zin in de <strong>ovt</strong> te vormen.
+        <br>let op: gebruik enkel feitelijke waarnemingen. maximaal 20 fragmenten beschikbaar.
     </div>
     <div id="teacher-controls">
         <strong style="color:var(--korps-blauw)">CONTROLE PANEEL DOCENT</strong><br>
-        <button class="btn-action" style="background:var(--korps-blauw); margin-top:10px" onclick="teacherNextStudent()">Volgende Student & Nieuwe Fragmenten</button>
+        <button class="btn-action" style="background:var(--korps-blauw); margin-top:10px" onclick="teacherNextStudent()">Volgende Student & Nieuwe Woorden</button>
     </div>
-    <div id="turn-display" class="status-bar">verbinding maken met database...</div>
+    <div id="turn-display" class="status-bar">verbinding maken...</div>
 </div>
 
 <div id="game-area">
@@ -132,38 +123,35 @@
     let myName, myClass, isMyTurn = false, draggingIndex = -1;
 
     const database = {
-        onderwerp: [
-            "de hoofdagent", "de verdachte", "de dwergpapegaai", "de korpschef", "de pizzabezorger", "een verwarde cavia", "de wijkagent", "de paashaas", "de surveillancewagen", "een vliegende schotel",
-            "de hoofdagenten", "de verdachten", "de dwergpapegaaien", "de korpschefs", "de pizzabezorgers", "verwarde cavia's", "de wijkagenten", "de paashazen", "de surveillancewagens", "vliegende schotels"
-        ],
-        pv_tt: ["hanteert", "ziet", "hoort", "onderzoekt", "pakt", "stopt", "vraagt", "observeert", "eet", "danst"],
+        onderwerp: ["de hoofdagent", "de verdachte", "de dwergpapegaai", "de korpschef", "de pizzabezorger", "de wijkagent", "de surveillancewagen", "de getuige", "de motorrijder", "de rechercheur", "de aangever"],
+        pv_tt: ["hanteert", "ziet", "hoort", "onderzoekt", "pakt", "stopt", "vraagt", "observeert"],
         pv_ovt: [
             "hanteerde", "hanteerden", "zag", "zagen", "hoorde", "hoorden", "onderzocht", "onderzochten", "pakte", "pakten", "stopte", "stopten", 
-            "vroeg", "vroegen", "observeerde", "observeerden", "besloop", "beslopen", "glibberde", "glibberden", "sprong", "sprongen", "verstopte", "verstopten"
+            "vroeg", "vroegen", "observeerde", "observeerden", "besloop", "beslopen", "sprong", "sprongen", "verstopte", "verstopten", "rende", "renden", "keek", "keken"
         ],
-        hulp: ["heeft", "had", "wordt", "mocht", "is", "was", "werd", "zijn", "worden", "kan", "mag", "hadden", "waren"],
-        lijdend: ["de handboeien", "de legitimatie", "de vluchtauto", "de opblaasbare eenhoorn", "een natte krant", "de discobal", "de mandarijnen", "het proces-verbaal"],
-        meewerkend: ["de korpschef", "de officier", "de goudvis", "de dwergpapegaai", "de slachtoffers", "de verdachte", "de buurvrouw"],
-        preps: ["aan", "voor", "met", "tegen", "bij", "over", "onder", "tussen"],
-        vd: ["gepakt", "gezien", "gehoord", "geadopteerd", "geobserveerd", "vastgesteld", "gefeliciteerd", "aangehouden"],
-        omstandigheid: ["gisteren", "onmiddellijk", "in de Kalverstraat", "met een noodgang", "op de Maan", "in het holst van de nacht", "op de Coolsingel", "zonder aarzelen", "tijdens de polonaise", "op het Damrak"]
+        hulp: ["had", "was", "werd", "waren", "hadden", "zouden"],
+        lijdend: ["de handboeien", "de legitimatie", "de vluchtauto", "de opblaasbare eenhoorn", "de mandarijnen", "het proces-verbaal", "de portofoon", "de wapenstok", "het dienstvoertuig"],
+        preps: ["aan", "voor", "met", "tegen", "bij", "over", "onder", "door", "tussen"],
+        vd: ["gepakt", "gezien", "gehoord", "geobserveerd", "vastgesteld", "aangehouden", "gefouilleerd", "gecontroleerd"],
+        omstandigheid: ["gisteren", "onmiddellijk", "in de Kalverstraat", "met een noodgang", "op de Coolsingel", "zonder aarzelen", "op het Damrak", "in de Hoogstraat", "tijdens de surveillance"]
     };
 
     function generateNewWords() {
+        // Exact 20 woorden selecteren met focus op OVT
         const pool = [
-            ...database.onderwerp.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.pv_tt.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.pv_ovt.sort(() => 0.5 - Math.random()).slice(0, 3),
-            ...database.hulp.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.lijdend.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.preps.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.vd.sort(() => 0.5 - Math.random()).slice(0, 2),
-            ...database.omstandigheid.sort(() => 0.5 - Math.random()).slice(0, 2)
+            ...database.onderwerp.sort(() => 0.5 - Math.random()).slice(0, 3),   // 3
+            ...database.pv_tt.sort(() => 0.5 - Math.random()).slice(0, 2),       // 2
+            ...database.pv_ovt.sort(() => 0.5 - Math.random()).slice(0, 6),      // 6 (Zware focus)
+            ...database.hulp.sort(() => 0.5 - Math.random()).slice(0, 2),       // 2
+            ...database.lijdend.sort(() => 0.5 - Math.random()).slice(0, 2),     // 2
+            ...database.preps.sort(() => 0.5 - Math.random()).slice(0, 2),       // 2
+            ...database.omstandigheid.sort(() => 0.5 - Math.random()).slice(0, 3) // 3
         ];
+
         return pool.sort(() => 0.5 - Math.random()).map((text, i) => ({
             text: text,
-            x: 80 + (Math.random() * (window.innerWidth - 320)),
-            y: 50 + (Math.random() * 260)
+            x: 50 + (Math.random() * (window.innerWidth - 250)),
+            y: 40 + (Math.random() * 240)
         }));
     }
 
@@ -179,15 +167,18 @@
     async function initSync() {
         const gameRef = ref(db, `draggames/${myClass}`);
         const snap = await get(gameRef);
+        
         if(!snap.exists()) {
             await set(gameRef, { words: generateNewWords(), currentTurn: myName, players: [myName] });
         } else {
-            const players = snap.val().players || [];
+            const data = snap.val();
+            let players = data.players || [];
             if(!players.includes(myName)) {
                 players.push(myName);
                 await update(gameRef, { players });
             }
         }
+
         onValue(gameRef, (snapshot) => {
             const data = snapshot.val();
             if(!data) return;
@@ -199,6 +190,13 @@
 
     function renderWords(words) {
         const area = document.getElementById('game-area');
+        
+        // Verwijder oude elementen als de set vernieuwd is (nieuwe beurt)
+        const boxes = area.querySelectorAll('.word-box');
+        if (boxes.length !== words.length) {
+            boxes.forEach(b => b.remove());
+        }
+
         words.forEach((w, i) => {
             if(draggingIndex === i) return; 
             let el = document.getElementById(`word-${i}`);
@@ -217,6 +215,7 @@
     }
 
     function startDrag(e, index) {
+        if(!isMyTurn) return;
         draggingIndex = index;
         const el = document.getElementById(`word-${index}`);
         el.classList.add('active-drag');
@@ -230,8 +229,8 @@
         const moveHandler = (ev) => {
             const curX = ev.touches ? ev.touches[0].clientX : ev.clientX;
             const curY = ev.touches ? ev.touches[0].clientY : ev.clientY;
-            const x = curX - rect.left - offsetX;
-            const y = curY - rect.top - offsetY;
+            const x = Math.max(0, Math.min(curX - rect.left - offsetX, rect.width - 100));
+            const y = Math.max(0, Math.min(curY - rect.top - offsetY, rect.height - 40));
             el.style.left = x + 'px';
             el.style.top = y + 'px';
             update(ref(db, `draggames/${myClass}/words/${index}`), { x, y });
@@ -253,13 +252,20 @@
     }
 
     window.teacherNextStudent = async function() {
-        const snap = await get(ref(db, `draggames/${myClass}`));
+        const gameRef = ref(db, `draggames/${myClass}`);
+        const snap = await get(gameRef);
         const data = snap.val();
-        const players = data.players.filter(p => p !== 'docent');
-        if(players.length === 0) return alert("Geen studenten aanwezig.");
-        let nextIndex = (players.indexOf(data.currentTurn) + 1) % players.length;
-        await update(ref(db, `draggames/${myClass}`), {
-            currentTurn: players[nextIndex],
+        
+        const students = (data.players || []).filter(p => p !== 'docent');
+        if(students.length === 0) return alert("Geen studenten actief.");
+
+        let currentIndex = students.indexOf(data.currentTurn);
+        let nextIndex = (currentIndex + 1) % students.length;
+        let nextStudent = students[nextIndex];
+
+        await set(gameRef, {
+            ...data,
+            currentTurn: nextStudent,
             words: generateNewWords(),
             lastFeedback: null
         });
@@ -268,7 +274,7 @@
     function updateTurnDisplay(turn) {
         isMyTurn = (turn === myName);
         const display = document.getElementById('turn-display');
-        display.innerText = isMyTurn ? "U BENT AAN DE BEURT - BOUW EEN ZIN" : `STUDENT AAN HET WERK: ${turn.toUpperCase()}`;
+        display.innerText = isMyTurn ? "U BENT AAN DE BEURT" : `STUDENT AAN HET WERK: ${turn.toUpperCase()}`;
         display.style.background = isMyTurn ? "var(--succes)" : "var(--korps-blauw)";
     }
 
